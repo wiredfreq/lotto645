@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 번호 생성기</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React 및 Babel CDN (JSX 해석용) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const LottoGenerator = () => {
+            const [lottoSets, setLottoSets] = useState([]);
+
+            // 로또 번호 생성 로직
+            const generateLottoNumbers = () => {
+                const sets = [];
+                for (let i = 0; i < 5; i++) {
+                    const numbers = new Set();
+                    while (numbers.size < 6) {
+                        const num = Math.floor(Math.random() * 45) + 1;
+                        numbers.add(num);
+                    }
+                    sets.push(Array.from(numbers).sort((a, b) => a - b));
+                }
+                setLottoSets(sets);
+            };
+
+            useEffect(() => {
+                generateLottoNumbers();
+            }, []);
+
+            const getBallColor = (num) => {
+                if (num <= 10) return 'bg-yellow-400 text-yellow-900';
+                if (num <= 20) return 'bg-blue-500 text-white';
+                if (num <= 30) return 'bg-red-500 text-white';
+                if (num <= 40) return 'bg-gray-500 text-white';
+                return 'bg-green-500 text-white';
+            };
+
+            // 아이콘 컴포넌트 (SVG 직접 삽입)
+            const CloverIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-3"/><path d="M9 10a3 3 0 0 1-3-3 3 3 0 0 1 3-3c1.66 0 3 1.34 3 3a3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/><path d="M9 14a3 3 0 0 0-3 3 3 3 0 0 0 3 3c1.66 0 3-1.34 3-3a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3"/><path d="M12 10v4"/></svg>
+            );
+
+            const TrophyIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            );
+
+            const RefreshIcon = () => (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans">
+                    <div className="max-w-md w-full bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                        <div className="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 text-center relative text-white">
+                            <div className="absolute top-4 left-4 opacity-20"><CloverIcon /></div>
+                            <div className="absolute bottom-4 right-4 opacity-20"><TrophyIcon /></div>
+                            <h1 className="text-2xl font-bold mb-2">오늘의 행운 번호</h1>
+                            <p className="text-indigo-100 text-sm">Colin을 위한 5천원의 행복 (5세트)</p>
+                        </div>
+
+                        <div className="p-6 space-y-4">
+                            {lottoSets.map((set, setIndex) => (
+                                <div key={setIndex} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100 hover:border-indigo-200 transition-colors group">
+                                    <span className="text-xs font-bold text-slate-400 w-6">
+                                        {String.fromCharCode(65 + setIndex)}
+                                    </span>
+                                    <div className="flex gap-2">
+                                        {set.map((num, idx) => (
+                                            <div key={idx} className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold shadow-sm transform transition-transform group-hover:scale-105 ${getBallColor(num)}`}>
+                                                {num}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="p-6 pt-0">
+                            <button onClick={generateLottoNumbers} className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-200">
+                                <RefreshIcon />
+                                새로운 번호 생성하기
+                            </button>
+                            <p className="mt-4 text-center text-[10px] text-slate-400">
+                                * 이 번호는 무작위로 생성되었습니다. 당첨을 보장하지 않습니다. 재미로만 즐겨주세요!
+                            </p>
+                        </div>
+                    </div>
+                    <footer className="mt-8 text-slate-400 text-sm">Good Luck, Colin! 🍀</footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<LottoGenerator />);
+    </script>
+</body>
+</html>
